@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X Y B Calculator Table</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff88;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 100, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .input-section {
+            background: linear-gradient(135deg, #1a1a3e 0%, #16213e 100%);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            background: #0a0a1a;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            width: 120px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        button {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+            border: none;
+            color: #000000;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            align-self: flex-end;
+        }
+
+        button:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+            color: white;
+            margin-left: 10px;
+        }
+
+        .clear-btn:hover {
+            box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
+        }
+
+        .table-section {
+            overflow-x: auto;
+            background: linear-gradient(135deg, #1a1a3e 0%, #16213e 100%);
+            border: 2px solid #00ff88;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #0a4d4d 0%, #003333 100%);
+            color: #00ff88;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #00ff88;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            font-size: 13px;
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(0, 255, 136, 0.15);
+        }
+
+        .sum-row {
+            background: linear-gradient(135deg, #0a4d4d 0%, #003333 100%);
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+        }
+
+        .delete-btn {
+            background: #ff4444;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #cc0000;
+        }
+
+        .nav-button {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6f 100%);
+            border: none;
+            color: #000000;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #00cc88;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">X Y B Calculator Table</div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <div class="input-field">
+                    <label for="xInput">X Value</label>
+                    <input type="number" id="xInput" placeholder="Enter x" step="any">
+                </div>
+                <div class="input-field">
+                    <label for="yInput">Y Value</label>
+                    <input type="number" id="yInput" placeholder="Enter y" step="any">
+                </div>
+                <div class="input-field">
+                    <label for="bInput">B Value</label>
+                    <input type="number" id="bInput" placeholder="Enter b" step="any">
+                </div>
+                <button onclick="addRow()">Add Row</button>
+                <button class="clear-btn" onclick="clearAllData()">Clear All</button>
+            </div>
+            <div class="info-text">Enter X, Y, and B values and click "Add Row" to calculate all derived columns</div>
+        </div>
+
+        <div class="table-section">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>X</th>
+                        <th>Y</th>
+                        <th>B</th>
+                        <th>1/B</th>
+                        <th>X/B</th>
+                        <th>Y/B</th>
+                        <th>(X*Y)/B</th>
+                        <th>(X*X)/B</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+                <tfoot>
+                    <tr class="sum-row">
+                        <td colspan="2">SUM</td>
+                        <td id="sumY">0.000</td>
+                        <td id="sumB">0.000</td>
+                        <td id="sum1B">0.000</td>
+                        <td id="sumXB">0.000</td>
+                        <td id="sumYB">0.000</td>
+                        <td id="sumXYB">0.000</td>
+                        <td id="sumXXB">0.000</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <button class="nav-button" onclick="goToCalculator()">← Back to Calculator</button>
+    </div>
+
+    <script>
+        let dataRows = [];
+        let rowIndex = 0;
+
+        function addRow() {
+            const xInput = document.getElementById('xInput');
+            const yInput = document.getElementById('yInput');
+            const bInput = document.getElementById('bInput');
+
+            const x = parseFloat(xInput.value);
+            const y = parseFloat(yInput.value);
+            const b = parseFloat(bInput.value);
+
+            if (isNaN(x) || isNaN(y) || isNaN(b)) {
+                alert('Please enter valid X, Y, and B values');
+                return;
+            }
+
+            if (b === 0) {
+                alert('B cannot be zero');
+                return;
+            }
+
+            rowIndex++;
+            
+            // Calculate derived values
+            const col1B = 1 / b;  // 1/B
+            const colXB = x / b;  // X/B
+            const colYB = y / b;  // Y/B
+            const colXYB = (x * y) / b;  // (X*Y)/B
+            const colXXB = (x * x) / b;  // (X*X)/B
+
+            const row = {
+                index: rowIndex,
+                x: x,
+                y: y,
+                b: b,
+                col1B: col1B.toFixed(6),
+                colXB: colXB.toFixed(6),
+                colYB: colYB.toFixed(6),
+                colXYB: colXYB.toFixed(6),
+                colXXB: colXXB.toFixed(6)
+            };
+
+            dataRows.push(row);
+            renderTable();
+
+            // Clear inputs
+            xInput.value = '';
+            yInput.value = '';
+            bInput.value = '';
+            xInput.focus();
+        }
+
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            dataRows.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${row.index}</td>
+                    <td>${row.x}</td>
+                    <td>${row.y}</td>
+                    <td>${row.b}</td>
+                    <td>${row.col1B}</td>
+                    <td>${row.colXB}</td>
+                    <td>${row.colYB}</td>
+                    <td>${row.colXYB}</td>
+                    <td>${row.colXXB}</td>
+                    <td><button class="delete-btn" onclick="deleteRow(${idx})">Delete</button></td>
+                `;
+                tableBody.appendChild(tr);
+            });
+
+            updateSums();
+        }
+
+        function deleteRow(index) {
+            dataRows.splice(index, 1);
+            renderTable();
+        }
+
+        function updateSums() {
+            let sumY = 0, sumB = 0, sum1B = 0, sumXB = 0, sumYB = 0, sumXYB = 0, sumXXB = 0;
+
+            dataRows.forEach(row => {
+                sumY += parseFloat(row.y);
+                sumB += parseFloat(row.b);
+                sum1B += parseFloat(row.col1B);
+                sumXB += parseFloat(row.colXB);
+                sumYB += parseFloat(row.colYB);
+                sumXYB += parseFloat(row.colXYB);
+                sumXXB += parseFloat(row.colXXB);
+            });
+
+            document.getElementById('sumY').textContent = sumY.toFixed(3);
+            document.getElementById('sumB').textContent = sumB.toFixed(3);
+            document.getElementById('sum1B').textContent = sum1B.toFixed(3);
+            document.getElementById('sumXB').textContent = sumXB.toFixed(3);
+            document.getElementById('sumYB').textContent = sumYB.toFixed(3);
+            document.getElementById('sumXYB').textContent = sumXYB.toFixed(3);
+            document.getElementById('sumXXB').textContent = sumXXB.toFixed(3);
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data?')) {
+                dataRows = [];
+                rowIndex = 0;
+                document.getElementById('xInput').value = '';
+                document.getElementById('yInput').value = '';
+                document.getElementById('bInput').value = '';
+                renderTable();
+            }
+        }
+
+        function goToCalculator() {
+            window.location.href = 'calculator.html';
+        }
+
+        // Allow Enter key to add row
+        document.getElementById('bInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addRow();
+            }
+        });
+
+        document.getElementById('yInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('bInput').focus();
+            }
+        });
+
+        document.getElementById('xInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('yInput').focus();
+            }
+        });
+
+        // Ctrl+C to clear all
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'c') {
+                event.preventDefault();
+                clearAllData();
+            }
+        });
+
+        updateSums();
+    </script>
+</body>
+</html>

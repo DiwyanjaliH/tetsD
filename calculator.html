@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="cal.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sci-Fi Scientific Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000000;
+            font-family: 'Courier New', monospace;
+            overflow: auto;
+            position: relative;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 100, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            perspective: 1000px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .calculator {
+            background: linear-gradient(135deg, #1a1a3e 0%, #16213e 100%);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 20px;
+            width: 500px;
+            max-width: 95vw;
+            box-shadow: 
+                0 0 20px rgba(0, 255, 136, 0.5),
+                0 0 40px rgba(0, 100, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 136, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #00ff88;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .display {
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: right;
+            font-size: 24px;
+            color: #00ff88;
+            word-wrap: break-word;
+            word-break: break-all;
+            min-height: 60px;
+            max-height: 100px;
+            overflow-y: auto;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            text-shadow: 0 0 10px #00ff88;
+            box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.2);
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #1a1a3e 0%, #16213e 100%);
+            color: #00ff88;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.6);
+            transform: scale(1.05);
+            text-shadow: none;
+        }
+
+        button:active {
+            transform: scale(0.95);
+            box-shadow: inset 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .operator {
+            border-color: #00bfff;
+            color: #00bfff;
+            text-shadow: 0 0 5px #00bfff;
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.3);
+        }
+
+        .operator:hover {
+            background: linear-gradient(135deg, #00bfff 0%, #0099cc 100%);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(0, 191, 255, 0.8), 0 0 40px rgba(0, 191, 255, 0.6);
+            text-shadow: none;
+        }
+
+        .equals {
+            grid-column: span 2;
+            border-color: #ff00ff;
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
+        }
+
+        .equals:hover {
+            background: linear-gradient(135deg, #ff00ff 0%, #cc00cc 100%);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8), 0 0 40px rgba(255, 0, 255, 0.6);
+            text-shadow: none;
+        }
+
+        .function-btn {
+            border-color: #ffaa00;
+            color: #ffaa00;
+            text-shadow: 0 0 5px #ffaa00;
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.3);
+            font-size: 12px;
+        }
+
+        .function-btn:hover {
+            background: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(255, 170, 0, 0.8), 0 0 40px rgba(255, 170, 0, 0.6);
+            text-shadow: none;
+        }
+
+        .clear {
+            grid-column: span 2;
+            border-color: #ff3333;
+            color: #ff3333;
+            text-shadow: 0 0 5px #ff3333;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        .clear:hover {
+            background: linear-gradient(135deg, #ff3333 0%, #cc0000 100%);
+            color: #0a0e27;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.8), 0 0 40px rgba(255, 51, 51, 0.6);
+            text-shadow: none;
+        }
+
+        .status {
+            margin-top: 15px;
+            text-align: center;
+            font-size: 10px;
+            color: #00bfff;
+            text-shadow: 0 0 5px #00bfff;
+            letter-spacing: 2px;
+        }
+
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 0, 0, 0.15),
+                    rgba(0, 0, 0, 0.15) 1px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <div class="container">
+        <div class="calculator">
+            <div class="header">⚡ SCIENTIFIC SCI-FI CALCULATOR ⚡</div>
+            
+            <div class="display" id="display">0</div>
+            
+            <div class="buttons">
+                <button class="clear" onclick="clearDisplay()">C</button>
+                <button class="clear" onclick="deleteLast()">DEL</button>
+                <button class="operator" onclick="appendOperator('/')">/</button>
+                <button class="operator" onclick="appendOperator('*')">×</button>
+                <button class="function-btn" onclick="calculateSin()">sin</button>
+                
+                <button onclick="appendNumber('7')">7</button>
+                <button onclick="appendNumber('8')">8</button>
+                <button onclick="appendNumber('9')">9</button>
+                <button class="operator" onclick="appendOperator('-')">-</button>
+                <button class="function-btn" onclick="calculateCos()">cos</button>
+                
+                <button onclick="appendNumber('4')">4</button>
+                <button onclick="appendNumber('5')">5</button>
+                <button onclick="appendNumber('6')">6</button>
+                <button class="operator" onclick="appendOperator('+')">+</button>
+                <button class="function-btn" onclick="calculateTan()">tan</button>
+                
+                <button onclick="appendNumber('1')">1</button>
+                <button onclick="appendNumber('2')">2</button>
+                <button onclick="appendNumber('3')">3</button>
+                <button class="operator" onclick="toggleSign()">+/-</button>
+                <button class="function-btn" onclick="calculateLog10()">log</button>
+                
+                <button onclick="appendNumber('0')" style="grid-column: span 2;">0</button>
+                <button onclick="appendNumber('.')">.</button>
+                <button class="function-btn" onclick="calculateLn()">ln</button>
+                <button class="function-btn" onclick="calculateSqrt()">√</button>
+                
+                <button class="function-btn" onclick="calculateFactorial()">n!</button>
+                <button class="function-btn" onclick="calculatePower()">x^y</button>
+                <button class="function-btn" onclick="calculatePercent()">%</button>
+                <button class="function-btn" onclick="calculateReciprocal()">1/x</button>
+                <button class="function-btn" onclick="calculatePi()">π</button>
+                
+                <button class="equals" onclick="calculate()" style="grid-column: span 5;">=</button>
+            </div>
+            
+            <div class="status">● SYSTEM ONLINE ●</div>
+            <button style="width: 100%; margin-top: 15px; grid-column: span 5;" onclick="goToGraph()" class="operator">📊 GRAPH CONVERTER</button>
+            <button style="width: 100%; margin-top: 10px; grid-column: span 5;" onclick="goToTable()" class="operator">📋 DATA TABLE</button>
+            <button style="width: 100%; margin-top: 10px; grid-column: span 5;" onclick="goToLeastSquares()" class="operator">📈 LEAST SQUARES FIT</button>
+            <button style="width: 100%; margin-top: 10px; grid-column: span 5;" onclick="goToXYB()" class="operator">🔢 X Y B CALCULATOR</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentValue = '0';
+        let previousValue = '';
+        let operator = null;
+        let shouldResetDisplay = false;
+        let lastWasEquals = false;
+
+        function updateDisplay() {
+            const displayValue = currentValue.length > 15 ? currentValue.substring(0, 15) : currentValue;
+            display.textContent = displayValue;
+        }
+
+        function appendNumber(num) {
+            if (shouldResetDisplay) {
+                currentValue = num;
+                shouldResetDisplay = false;
+            } else {
+                if (currentValue === '0' && num !== '.') {
+                    currentValue = num;
+                } else if (num === '.' && currentValue.includes('.')) {
+                    return;
+                } else {
+                    currentValue += num;
+                }
+            }
+            lastWasEquals = false;
+            updateDisplay();
+        }
+
+        function appendOperator(op) {
+            if (operator !== null && !shouldResetDisplay) {
+                calculate();
+            }
+            previousValue = currentValue;
+            operator = op;
+            shouldResetDisplay = true;
+            lastWasEquals = false;
+        }
+
+        function calculate() {
+            if (operator === null || shouldResetDisplay) return;
+            
+            let result;
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+
+            switch(operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+
+            currentValue = result.toString();
+            operator = null;
+            shouldResetDisplay = true;
+            lastWasEquals = true;
+            updateDisplay();
+        }
+
+        function clearDisplay() {
+            currentValue = '0';
+            previousValue = '';
+            operator = null;
+            shouldResetDisplay = false;
+            lastWasEquals = false;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentValue.length > 1) {
+                currentValue = currentValue.slice(0, -1);
+            } else {
+                currentValue = '0';
+            }
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            currentValue = currentValue.startsWith('-') ? currentValue.slice(1) : '-' + currentValue;
+            updateDisplay();
+        }
+
+        // Scientific Functions
+        function calculateSin() {
+            const radians = parseFloat(currentValue) * (Math.PI / 180);
+            currentValue = Math.sin(radians).toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateCos() {
+            const radians = parseFloat(currentValue) * (Math.PI / 180);
+            currentValue = Math.cos(radians).toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateTan() {
+            const radians = parseFloat(currentValue) * (Math.PI / 180);
+            currentValue = Math.tan(radians).toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateLog10() {
+            const value = parseFloat(currentValue);
+            if (value <= 0) {
+                currentValue = 'Error';
+            } else {
+                currentValue = Math.log10(value).toString();
+            }
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateLn() {
+            const value = parseFloat(currentValue);
+            if (value <= 0) {
+                currentValue = 'Error';
+            } else {
+                currentValue = Math.log(value).toString();
+            }
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateSqrt() {
+            const value = parseFloat(currentValue);
+            if (value < 0) {
+                currentValue = 'Error';
+            } else {
+                currentValue = Math.sqrt(value).toString();
+            }
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateFactorial() {
+            const num = parseInt(currentValue);
+            if (num < 0) {
+                currentValue = 'Error';
+            } else if (num === 0 || num === 1) {
+                currentValue = '1';
+            } else {
+                let result = 1;
+                for (let i = 2; i <= num; i++) {
+                    result *= i;
+                }
+                currentValue = result.toString();
+            }
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculatePower() {
+            previousValue = currentValue;
+            operator = '^';
+            shouldResetDisplay = true;
+        }
+
+        function calculatePercent() {
+            currentValue = (parseFloat(currentValue) / 100).toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculateReciprocal() {
+            const value = parseFloat(currentValue);
+            if (value === 0) {
+                currentValue = 'Error';
+            } else {
+                currentValue = (1 / value).toString();
+            }
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        function calculatePi() {
+            currentValue = Math.PI.toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        // Override calculate to handle power operator
+        const originalCalculate = calculate;
+        calculate = function() {
+            if (operator === null || shouldResetDisplay) return;
+            
+            let result;
+            const prev = parseFloat(previousValue);
+            const current = parseFloat(currentValue);
+
+            switch(operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    result = prev / current;
+                    break;
+                case '^':
+                    result = Math.pow(prev, current);
+                    break;
+                default:
+                    return;
+            }
+
+            currentValue = result.toString();
+            operator = null;
+            shouldResetDisplay = true;
+            lastWasEquals = true;
+            updateDisplay();
+        };
+
+        updateDisplay();
+
+        // Keyboard support
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+
+            // Numbers 0-9
+            if (key >= '0' && key <= '9') {
+                appendNumber(key);
+            }
+            // Decimal point
+            else if (key === '.') {
+                appendNumber('.');
+            }
+            // Operators
+            else if (key === '+') {
+                appendOperator('+');
+            }
+            else if (key === '-') {
+                appendOperator('-');
+            }
+            else if (key === '*') {
+                appendOperator('*');
+            }
+            else if (key === '/') {
+                event.preventDefault(); // Prevent browser search
+                appendOperator('/');
+            }
+            // Enter or Equals
+            else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            }
+            // Backspace for delete
+            else if (key === 'Backspace') {
+                event.preventDefault();
+                deleteLast();
+            }
+            // Escape for clear
+            else if (key === 'Escape') {
+                clearDisplay();
+            }
+            // Ctrl for clear all
+            else if (key === 'Control') {
+                event.preventDefault();
+                clearDisplay();
+            }
+            // Parentheses for reciprocal (1/x)
+            else if (key === 'r' || key === 'R') {
+                calculateReciprocal();
+            }
+            // s for sine
+            else if (key === 's' || key === 'S') {
+                calculateSin();
+            }
+            // c for cosine
+            else if (key === 'c' || key === 'C') {
+                calculateCos();
+            }
+            // t for tangent
+            else if (key === 't' || key === 'T') {
+                calculateTan();
+            }
+            // l for log
+            else if (key === 'l' || key === 'L') {
+                calculateLog10();
+            }
+            // n for natural log
+            else if (key === 'n' || key === 'N') {
+                calculateLn();
+            }
+            // e for square root
+            else if (key === 'e' || key === 'E') {
+                calculateSqrt();
+            }
+            // p for pi
+            else if (key === 'p' || key === 'P') {
+                calculatePi();
+            }
+            // f for factorial
+            else if (key === 'f' || key === 'F') {
+                calculateFactorial();
+            }
+            // % for percent
+            else if (key === '%') {
+                calculatePercent();
+            }
+            // ^ for power
+            else if (key === '^') {
+                calculatePower();
+            }
+        });
+
+        // Navigation to graph page
+        function goToGraph() {
+            window.location.href = 'graph.html';
+        }
+
+        // Navigation to table page
+        function goToTable() {
+            window.location.href = 'table.html';
+        }
+
+        // Navigation to least squares page
+        function goToLeastSquares() {
+            window.location.href = 'least_squares.html';
+        }
+
+        // Navigation to XYB calculator
+        function goToXYB() {
+            window.location.href = 'xyb_calculator.html';
+        }
+    </script>
+</body>
+</html>
